@@ -3,22 +3,31 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:17234",
-      "sslPort": 44330
+      "applicationUrl": "http://localhost:5042",
+      "sslPort": 0
     }
   },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
-      "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "Secret": "password",
+        "ClientId": "test.client",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Scope": "com.bvelop.homeapi"
       }
     },
     "XmlRpc": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
+        "Secret": "XAbkjjgjpa36FDRE8RUJGXAmwBaW",
+        "ClientId": "stack.xmlrpc",
+        "Scope": "graphql.writer",
+        "Issuer": "https://newidentity.qaybe.de",
+        "HomematicEndpoint": "http://homematic-raspi:2001",
+        "InstanceName": "TestInstance",
+        "InstanceEndpoint": "192.168.178.35:5042",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:5000"

@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
+using com.b_velop.XmlRpc.BL;
+using com.b_velop.XmlRpc.Constants;
+using com.b_velop.XmlRpc.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace XmlRpc.Middlewares
@@ -14,20 +19,24 @@ namespace XmlRpc.Middlewares
         private readonly RequestDelegate _next;
         protected ILogger<XmlRpcMiddleware> Logger { get; }
         private const string _response = @"<?xml version=""1.0""?><methodResponse><params><param><value><string>OK</string></value></param></params></methodResponse>";
+        private IMemoryCache _cache;
 
         public XmlRpcMiddleware(
+            IMemoryCache cache,
             ILogger<XmlRpcMiddleware> logger,
             RequestDelegate next)
         {
             Logger = logger;
+            _cache = cache;
             _next = next;
         }
 
         public async Task Invoke(
             HttpContext httpContext)
         {
-            if (httpContext.Request.Method == "POST")
+            if (httpContext.Request.Method == "POST" && httpContext.Request.Path == "/RPC2")
             {
+                Logger.LogInformation($"Request incoming\n{httpContext.Request.Path}");
                 //using (var sr = new StreamReader(httpContext.Request.Body))
                 //{
                 //var body = await sr.ReadToEndAsync();
@@ -41,6 +50,7 @@ namespace XmlRpc.Middlewares
 
                 using (var sw = new StreamWriter(httpContext.Response.Body))
                     await sw.WriteAsync(_response);
+                _cache.Set(Strings.LastConnection, DateTime.Now);
             }
             return;// _next(httpContext);
         }
@@ -58,19 +68,7 @@ namespace XmlRpc.Middlewares
 
     public class Parser
     {
-        public class Saver
-        {
-            public DateTimeOffset Time { get; set; }
-            public string Instance { get; set; }
-            public string Id { get; set; }
-            public string Name { get; set; }
-            public string Value { get; set; }
-            public string Type { get; set; }
-            public override string ToString()
-            {
-                return $"{Time}\n  {Id}\n   {Name}\n   {Value} ({Type})";
-            }
-        }
+        public static HomematicValueList HomematicValues = new HomematicValueList();
 
         public static void Parse(
             ILogger<XmlRpcMiddleware> logger,
@@ -79,14 +77,18 @@ namespace XmlRpc.Middlewares
             var doc = new XmlDocument();
             doc.Load(inputString);
 
-            XmlNodeList nodeList = doc.GetElementsByTagName("value");
-            if (nodeList != null)
+            var nodeList = doc.GetElementsByTagName("value");
+            try
+            {
+                if (nodeList == null)
+                    return;
+
                 for (var i = 0; i < nodeList.Count; i++)
                 {
-                    var n = nodeList[i];// as XmlNode;
-                    if (n?.InnerXml == "Laptop")
+                    var n = nodeList[i]; // as XmlNode;
+                    if (n?.InnerXml == Strings.InstanceId)
                     {
-                        var r = new Saver
+                        HomematicValues.Add(new HomematicValue
                         {
                             Time = DateTimeOffset.Now,
                             Instance = n.InnerXml,
@@ -94,10 +96,15 @@ namespace XmlRpc.Middlewares
                             Name = nodeList[++i].InnerXml,
                             Value = nodeList[++i].InnerText,
                             Type = nodeList[i].FirstChild.Name,
-                        };
-                        logger.LogInformation(r.ToString());
+                        });
                     }
                 }
+                logger.LogInformation($"{HomematicValues.Count} items in list.");
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error while parsing");
+            }
         }
     }
 }
