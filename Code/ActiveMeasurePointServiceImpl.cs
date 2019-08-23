@@ -23,15 +23,10 @@ namespace com.b_velop.XmlRpc.Code
             try
             {
                 var response = await PostRequestAsync(Query.ActiveMeasurePoints);
-                var data = response.GetDataFieldAs<IEnumerable<ActiveMeasurePoint>>("activeMeasurePoints");
-                foreach (var d in data)
-                {
-                    _logger.LogInformation($"{d.ExternId} == {d.HomematicId}");
-                }
-                if (data == null)
+                var activeMeasurPoints = response.GetDataFieldAs<IEnumerable<ActiveMeasurePoint>>("activeMeasurePoints");
+                if (activeMeasurPoints == null)
                     _logger.LogWarning(2221, $"Error occurred while request ActiveMeasurePoints.");
-
-                return data;
+                return activeMeasurPoints;
             }
             catch (Exception ex)
             {

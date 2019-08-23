@@ -64,10 +64,12 @@ namespace com.b_velop.XmlRpc.Code
             if (uploadValues.Count == 0)
                 return;
 
-            await PostRequestAsync(
-                Query.CreateMeasureValueBunch,
-                "InsertMeasureValueBunch",
-                new { points = uploadPoints, values = uploadValues });
+            var result = await PostRequestAsync(
+                            Query.CreateMeasureValueBunch,
+                            "InsertMeasureValueBunch",
+                            new { points = uploadPoints, values = uploadValues });
+            _logger.LogInformation($"Uploaded '{uploadValues.Count}' values with status code {result}");
+
         }
     }
 }

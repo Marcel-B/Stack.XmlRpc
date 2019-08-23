@@ -66,7 +66,7 @@ namespace com.b_velop.XmlRpc.Code
                             Value = nodeList[++i].InnerText,
                             Type = nodeList[i].FirstChild.Name,
                         };
-                        _logger.LogInformation(homematicValue.Id);
+
                         if (_alarmIds.ContainsKey(homematicValue.AllId))
                         {
                             // Alarm knopf wurde gedrückt
