@@ -78,7 +78,9 @@ namespace com.b_velop.XmlRpc.Code
                         if (activeIds.Contains(homematicValue.AllId))
                         {
                             values.Add(homematicValue);
+#if DEBUG
                             _logger.LogInformation($"{homematicValue} added to list");
+#endif
                         }
                     }
                 }

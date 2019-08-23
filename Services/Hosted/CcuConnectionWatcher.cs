@@ -76,7 +76,7 @@ namespace com.b_velop.XmlRpc.Services.Hosted
             }
 
             if (!_cache.TryGetValue(Strings.LastUpload, out DateTime lastUpload) ||
-                DateTime.Now - lastUpload > TimeSpan.FromMinutes(5))
+                DateTime.Now - lastUpload > TimeSpan.FromMinutes(10))
             {
                 if (_cache.TryGetValue(Strings.Values, out HomematicValueList values))
                 {
