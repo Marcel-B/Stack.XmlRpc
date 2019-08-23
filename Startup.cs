@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using com.b_velop.XmlRpc.BL;
 using com.b_velop.XmlRpc.Code;
 using com.b_velop.XmlRpc.Constants;
 using com.b_velop.XmlRpc.Middlewares;
@@ -13,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
-namespace XmlRpc
+namespace com.b_velop.XmlRpc
 {
     public class Startup
     {
@@ -50,7 +51,9 @@ namespace XmlRpc
             services.AddHttpClient<TokenService, TokenServiceImpl>();
 
             services.AddScoped<ActiveMeasurePointService, ActiveMeasurePointServiceImpl>();
+            services.AddScoped<DataUploadService, DataUploadServiceImpl>();
             services.AddScoped<GraphQLClient>(x => new GraphQLClient("https://data.qaybe.de/graphql"));
+            services.AddScoped<Parser, ParserImpl>();
 
             services.AddScoped(_ => new Secrets
             {

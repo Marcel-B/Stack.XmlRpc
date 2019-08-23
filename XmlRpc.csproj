@@ -17,8 +17,4 @@
     <PackageReference Include="NLog" Version="4.6.6" />
     <PackageReference Include="NLog.StructuredLogging.Json" Version="4.0.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Middlewares\" />
-  </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@
     public class Query
     {
         public const string ActiveMeasurePoints = "{ activeMeasurePoints { id isActive point { id externId } } }";
+        public const string MeasurePoints = "{ measurePoints {id externId } }";
 
         public const string CreateMeasureValue = "mutation CreateMeasureValue($value: Float!, $point: ID!) { createEasyMeasureValue(pointId: $point, value: $value) { id } }";
 

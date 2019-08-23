@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using com.b_velop.XmlRpc.BL;
 using com.b_velop.XmlRpc.Constants;
-using com.b_velop.XmlRpc.Middlewares;
 using com.b_velop.XmlRpc.Services.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +32,17 @@ namespace com.b_velop.XmlRpc.Services.Hosted
             _cache.Set(Strings.AlarmActive, false);
             _logger = logger;
             _services = services;
+            _cache.Set(Strings.AlarmIds, new Dictionary<string, bool>
+            {
+                // Alarmknopf
+                //{"NEQ0889879:1:INSTALL_TEST", nhew Guid("") },
+                {"NEQ0889879:1:PRESS_SHORT", false}, // AUS
+                {"NEQ0889879:1:PRESS_LONG", false}, // AUS
+                //{"NEQ0889879:2:INSTALL_TEST", new Guid("") },
+                {"NEQ0889879:2:PRESS_SHORT", true}, // AN
+                {"NEQ0889879:2:PRESS_LONG", true}, // AN
+
+            });
         }
 
         public Task StartAsync(
@@ -43,7 +55,7 @@ namespace com.b_velop.XmlRpc.Services.Hosted
         private async void DoWork(
             object state)
         {
-            using(var sco = _services.CreateScope())
+            using (var sco = _services.CreateScope())
             {
                 var alarm = sco.ServiceProvider.GetRequiredService<AlarmService>();
                 await alarm.UpdateAlarmAsync();
@@ -53,7 +65,6 @@ namespace com.b_velop.XmlRpc.Services.Hosted
                 _logger.LogInformation("No Connection. Start connecting to CCU");
                 await _service.ConnectToCcuAsync();
                 _cache.Set(Strings.LastConnection, DateTime.Now);
-
             }
             else
             {
@@ -67,15 +78,16 @@ namespace com.b_velop.XmlRpc.Services.Hosted
             if (!_cache.TryGetValue(Strings.LastUpload, out DateTime lastUpload) ||
                 DateTime.Now - lastUpload > TimeSpan.FromMinutes(5))
             {
-                var values = Parser.HomematicValues.WithdrawItems();
-                foreach (var homematicValue in values)
+                if (_cache.TryGetValue(Strings.Values, out HomematicValueList values))
                 {
-                    _logger.LogInformation($"Item:\n{homematicValue}\n");
+                    using (var scope = _services.CreateScope())
+                    {
+                        var uploadService = scope.ServiceProvider.GetRequiredService<DataUploadService>();
+                        await uploadService.UploadValuesAsync();
+                    }
+                    _cache.Set(Strings.LastUpload, DateTime.Now);
                 }
-
-                _cache.Set(Strings.LastUpload, DateTime.Now);
             }
-
 
             if (!_cache.TryGetValue(Strings.LastActiveMeasurePointsPull, out DateTime lastActivePull) ||
                 DateTime.Now - lastActivePull > TimeSpan.FromHours(1))
@@ -85,7 +97,6 @@ namespace com.b_velop.XmlRpc.Services.Hosted
                     var activeMeasurePointService = scope.ServiceProvider.GetRequiredService<ActiveMeasurePointService>();
                     var activeMeasurePoints = await activeMeasurePointService.GetActiveMeasurePointsAsync();
                     var activeIds = activeMeasurePoints.Where(_ => _.IsActive).Select(_ => _.ExternId);
-                    Parser.IDs = activeIds.ToArray();
                     _cache.Set(Strings.ActiveMeasurePoints, activeIds.ToArray());
                 }
                 _cache.Set(Strings.LastActiveMeasurePointsPull, DateTime.Now);
