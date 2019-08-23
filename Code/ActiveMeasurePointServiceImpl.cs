@@ -16,7 +16,6 @@ namespace com.b_velop.XmlRpc.Code
             GraphQLClient graphQLClient,
             ILogger<object> logger) : base(tokenService, graphQLClient, logger)
         {
-
         }
 
         public async Task<IEnumerable<ActiveMeasurePoint>> GetActiveMeasurePointsAsync()
@@ -25,7 +24,10 @@ namespace com.b_velop.XmlRpc.Code
             {
                 var response = await PostRequestAsync(Query.ActiveMeasurePoints);
                 var data = response.GetDataFieldAs<IEnumerable<ActiveMeasurePoint>>("activeMeasurePoints");
-
+                foreach (var d in data)
+                {
+                    _logger.LogInformation($"{d.ExternId} == {d.HomematicId}");
+                }
                 if (data == null)
                     _logger.LogWarning(2221, $"Error occurred while request ActiveMeasurePoints.");
 

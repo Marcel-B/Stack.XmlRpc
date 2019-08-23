@@ -10,5 +10,16 @@
         public string Id { get; set; }
         public bool IsActive { get; set; }
         public Point Point { get; set; }
+        public string ExternId => Point?.ExternId;
+        public string HomematicId { get 
+        {
+                var idx = Point.ExternId.LastIndexOf(':');
+                if(idx > 0)
+                {
+                    return Point.ExternId.Substring(0, idx);
+                }
+                return Point.ExternId;
+            }
+        }
     }
 }

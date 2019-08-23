@@ -43,25 +43,34 @@ namespace com.b_velop.XmlRpc.Code
                     return token;
             }
 
-            var secrets = _services.GetRequiredService<Secrets>();
+            try
+            {
 
-            var credentials = Encoding.ASCII.GetBytes($"{secrets.ClientId}:{secrets.Secret}");
-            _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", GetBase64Credentials(credentials));
-            var dict = new Dictionary<string, string>
+                var secrets = _services.GetRequiredService<Secrets>();
+
+                var credentials = Encoding.ASCII.GetBytes($"{secrets.ClientId}:{secrets.Secret}");
+                _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", GetBase64Credentials(credentials));
+                var dict = new Dictionary<string, string>
             {
                 { "grant_type", "client_credentials"},
                 { "scope", secrets.Scope }
             };
 
-            var content = new FormUrlEncodedContent(dict);
-            var response = await _client.PostAsync("/connect/token", content);
-            var ts = await response.Content.ReadAsStringAsync();
-            token = JsonConvert.DeserializeObject<Token>(ts);
+                var content = new FormUrlEncodedContent(dict);
+                var response = await _client.PostAsync("/connect/token", content);
+                var ts = await response.Content.ReadAsStringAsync();
+                token = JsonConvert.DeserializeObject<Token>(ts);
 
-            _cache.Set(Strings.Token, token);
-            _cache.Set(Strings.Expiration, DateTime.Now.AddSeconds(token.ExpiresIn));
+                _cache.Set(Strings.Token, token);
+                _cache.Set(Strings.Expiration, DateTime.Now.AddSeconds(token.ExpiresIn));
 
-            return token;
+                return token;
+            }
+            catch(Exception e)
+            {
+                Logger.LogError(e, "Error while token");
+                return null;
+            }
         }
         public string GetBase64Credentials(byte[] credentials)
             => Convert.ToBase64String(credentials);

@@ -11,5 +11,7 @@ namespace com.b_velop.XmlRpc.Models
         public string HomematicEndpoint { get; set; }
         public string InstanceName { get; set; }
         public string InstanceEndpoint { get; set; }
+        public string AlarmLiving { get; set; }
+        public string AlarmFloor { get; set; }
     }
 }

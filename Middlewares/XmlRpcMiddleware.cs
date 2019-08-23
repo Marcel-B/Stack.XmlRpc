@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using com.b_velop.XmlRpc.BL;
@@ -11,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
-namespace XmlRpc.Middlewares
+namespace com.b_velop.XmlRpc.Middlewares
 {
     // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
     public class XmlRpcMiddleware
@@ -36,13 +37,7 @@ namespace XmlRpc.Middlewares
         {
             if (httpContext.Request.Method == "POST" && httpContext.Request.Path == "/RPC2")
             {
-                Logger.LogInformation($"Request incoming\n{httpContext.Request.Path}");
-                //using (var sr = new StreamReader(httpContext.Request.Body))
-                //{
-                //var body = await sr.ReadToEndAsync();
-                //Logger.LogInformation(body);
                 Parser.Parse(Logger, httpContext.Request.Body);
-                //}
 
                 httpContext.Response.Headers.Add("Content-Type", "text/xml; charset=iso-8859-1");
                 httpContext.Response.Headers.Add("Content-Length", _response.Length.ToString());
@@ -52,7 +47,7 @@ namespace XmlRpc.Middlewares
                     await sw.WriteAsync(_response);
                 _cache.Set(Strings.LastConnection, DateTime.Now);
             }
-            return;// _next(httpContext);
+            return;
         }
     }
 
@@ -69,17 +64,18 @@ namespace XmlRpc.Middlewares
     public class Parser
     {
         public static HomematicValueList HomematicValues = new HomematicValueList();
-
+        public static string[] IDs = new string[0];
         public static void Parse(
             ILogger<XmlRpcMiddleware> logger,
             Stream inputString)
         {
-            var doc = new XmlDocument();
-            doc.Load(inputString);
-
-            var nodeList = doc.GetElementsByTagName("value");
             try
             {
+                var doc = new XmlDocument();
+                doc.Load(inputString);
+
+                var nodeList = doc.GetElementsByTagName("value");
+
                 if (nodeList == null)
                     return;
 
@@ -88,7 +84,7 @@ namespace XmlRpc.Middlewares
                     var n = nodeList[i]; // as XmlNode;
                     if (n?.InnerXml == Strings.InstanceId)
                     {
-                        HomematicValues.Add(new HomematicValue
+                        var hv = new HomematicValue
                         {
                             Time = DateTimeOffset.Now,
                             Instance = n.InnerXml,
@@ -96,7 +92,13 @@ namespace XmlRpc.Middlewares
                             Name = nodeList[++i].InnerXml,
                             Value = nodeList[++i].InnerText,
                             Type = nodeList[i].FirstChild.Name,
-                        });
+                        };
+                        logger.LogInformation(hv.Id);
+                        if (IDs.Contains(hv.AllId))
+                        {
+                            HomematicValues.Add(hv);
+                            logger.LogInformation($"{hv} added to list");
+                        }
                     }
                 }
                 logger.LogInformation($"{HomematicValues.Count} items in list.");

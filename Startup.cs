@@ -1,6 +1,7 @@
 ﻿using System.Net.Mime;
 using com.b_velop.XmlRpc.Code;
 using com.b_velop.XmlRpc.Constants;
+using com.b_velop.XmlRpc.Middlewares;
 using com.b_velop.XmlRpc.Models;
 using com.b_velop.XmlRpc.Services.Hosted;
 using com.b_velop.XmlRpc.Services.Http;
@@ -10,7 +11,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using XmlRpc.Middlewares;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace XmlRpc
@@ -36,6 +36,8 @@ namespace XmlRpc
             var homematicEndpoint = System.Environment.GetEnvironmentVariable("HomematicEndpoint");
             var instanceName = System.Environment.GetEnvironmentVariable("InstanceName");
             var instanceEndpoint = System.Environment.GetEnvironmentVariable("InstanceEndpoint");
+            var alarmLiving = System.Environment.GetEnvironmentVariable("AlarmLiving");
+            var alarmFloor = System.Environment.GetEnvironmentVariable("AlarmFloor");
 
             Strings.InstanceId = instanceName;
             Strings.MyUrl = instanceEndpoint;
@@ -44,15 +46,13 @@ namespace XmlRpc
             services.AddHostedService<CcuConnectionWatcher>();
 
             services.AddHttpClient<CcuConnector, CcuConnectorImpl>();
-
+            services.AddHttpClient<AlarmService, AlarmServiceImpl>();
             services.AddHttpClient<TokenService, TokenServiceImpl>();
 
             services.AddScoped<ActiveMeasurePointService, ActiveMeasurePointServiceImpl>();
             services.AddScoped<GraphQLClient>(x => new GraphQLClient("https://data.qaybe.de/graphql"));
 
-
-
-            services.AddSingleton(new Secrets
+            services.AddScoped(_ => new Secrets
             {
                 ClientId = clientId,
                 Scope = scope,
@@ -60,7 +60,9 @@ namespace XmlRpc
                 Issuer = issuer,
                 HomematicEndpoint = homematicEndpoint,
                 InstanceEndpoint = instanceEndpoint,
-                InstanceName = instanceName
+                InstanceName = instanceName,
+                AlarmFloor = alarmFloor,
+                AlarmLiving = alarmLiving
             });
 
         }

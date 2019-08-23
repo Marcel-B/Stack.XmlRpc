@@ -3,12 +3,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using com.b_velop.XmlRpc.Constants;
+using com.b_velop.XmlRpc.Middlewares;
 using com.b_velop.XmlRpc.Services.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using XmlRpc.Middlewares;
 
 namespace com.b_velop.XmlRpc.Services.Hosted
 {
@@ -28,6 +28,7 @@ namespace com.b_velop.XmlRpc.Services.Hosted
         {
             _service = service;
             _cache = cache;
+            _cache.Set(Strings.AlarmActive, false);
             _logger = logger;
             _services = services;
         }
@@ -42,6 +43,11 @@ namespace com.b_velop.XmlRpc.Services.Hosted
         private async void DoWork(
             object state)
         {
+            using(var sco = _services.CreateScope())
+            {
+                var alarm = sco.ServiceProvider.GetRequiredService<AlarmService>();
+                await alarm.UpdateAlarmAsync();
+            }
             if (!_cache.TryGetValue(Strings.LastConnection, out DateTime time))
             {
                 _logger.LogInformation("No Connection. Start connecting to CCU");
@@ -78,7 +84,9 @@ namespace com.b_velop.XmlRpc.Services.Hosted
                 {
                     var activeMeasurePointService = scope.ServiceProvider.GetRequiredService<ActiveMeasurePointService>();
                     var activeMeasurePoints = await activeMeasurePointService.GetActiveMeasurePointsAsync();
-                    _cache.Set(Strings.ActiveMeasurePoints, activeMeasurePoints.ToArray());
+                    var activeIds = activeMeasurePoints.Where(_ => _.IsActive).Select(_ => _.ExternId);
+                    Parser.IDs = activeIds.ToArray();
+                    _cache.Set(Strings.ActiveMeasurePoints, activeIds.ToArray());
                 }
                 _cache.Set(Strings.LastActiveMeasurePointsPull, DateTime.Now);
             }

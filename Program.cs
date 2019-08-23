@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NLog.Web;
 
 namespace XmlRpc
 {
@@ -14,12 +10,34 @@ namespace XmlRpc
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var environmentVariables = Environment.GetEnvironmentVariables();
+            var file = "nlog.config"; //env ==  "Development" ? "nlog-dev.config" : "nlog.config";
+            var logger = NLogBuilder.ConfigureNLog(file).GetCurrentClassLogger();
+            try
+            {
+                CreateWebHostBuilder(args).Build().Run();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Stopped program because of exception");
+                throw;
+            }
+            finally
+            {
+                NLog.LogManager.Shutdown();
+            }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseUrls("http://*:5042")
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .ConfigureLogging((hostingContext, logging) =>
+                  {
+                      logging.ClearProviders();
+                      logging.SetMinimumLevel(LogLevel.Trace);
+                  })
+               .UseUrls("http://*:5042")
+               .UseNLog();
     }
 }

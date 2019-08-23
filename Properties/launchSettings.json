@@ -3,31 +3,31 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:5042",
-      "sslPort": 0
+      "applicationUrl": "http://localhost:17234",
+      "sslPort": 44330
     }
   },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
+      "launchBrowser": true,
       "environmentVariables": {
-        "Secret": "password",
-        "ClientId": "test.client",
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "Scope": "com.bvelop.homeapi"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "XmlRpc": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "Secret": "XAbkjjgjpa36FDRE8RUJGXAmwBaW",
-        "ClientId": "stack.xmlrpc",
-        "Scope": "graphql.writer",
-        "Issuer": "https://newidentity.qaybe.de",
         "HomematicEndpoint": "http://homematic-raspi:2001",
-        "InstanceName": "TestInstance",
-        "InstanceEndpoint": "192.168.178.35:5042",
+        "Issuer": "https://newidentity.qaybe.de",
+        "Scope": "graphql.writer",
+        "Secret": "XAbkjjgjpa36FDRE8RUJGXAmwBaW",
+        "InstanceName": "MacBook",
+        "ClientId": "stack.xmlrpc",
+        "InstanceEndpoint": "http://192.168.178.21:5042",
+        "AlarmLiving": "http://192.168.178.23",
+        "AlarmFloor": "http://192.168.178.24",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:5000"
