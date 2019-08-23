@@ -24,10 +24,10 @@
         "Scope": "graphql.writer",
         "Secret": "XAbkjjgjpa36FDRE8RUJGXAmwBaW",
         "InstanceName": "MacBook",
-        "ClientId": "stack.xmlrpc",
-        "InstanceEndpoint": "http://192.168.178.35:5042",
         "AlarmLiving": "http://192.168.178.23",
+        "ClientId": "stack.xmlrpc",
         "AlarmFloor": "http://192.168.178.24",
+        "InstanceEndpoint": "http://192.168.178.21:5042",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:5000"

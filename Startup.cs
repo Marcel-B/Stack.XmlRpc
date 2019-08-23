@@ -1,4 +1,6 @@
-﻿using System.Net.Mime;
+using System.Collections;
+using System.Collections.Generic;
+using System.Net.Mime;
 using com.b_velop.XmlRpc.BL;
 using com.b_velop.XmlRpc.Code;
 using com.b_velop.XmlRpc.Constants;
@@ -12,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace com.b_velop.XmlRpc
@@ -19,10 +22,13 @@ namespace com.b_velop.XmlRpc
     public class Startup
     {
         private IHostingEnvironment Environment { get; }
+        ILogger<Startup> Logger { get; }
 
         public Startup(
+            ILogger<Startup> logger,
             IHostingEnvironment environment)
         {
+            Logger = logger;
             Environment = environment;
         }
 
@@ -30,6 +36,12 @@ namespace com.b_velop.XmlRpc
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            Hashtable evs = (Hashtable)System.Environment.GetEnvironmentVariables();
+            foreach (var e in evs)
+            {
+                var l = (DictionaryEntry)e;
+                Logger.LogInformation($"Environment Variable: {l.Key} = {l.Value}");
+            }
             var clientId = System.Environment.GetEnvironmentVariable("ClientId");
             var scope = System.Environment.GetEnvironmentVariable("Scope");
             var secret = System.Environment.GetEnvironmentVariable("Secret");
