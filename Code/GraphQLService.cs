@@ -11,17 +11,17 @@ using Microsoft.Extensions.Logging;
 
 namespace com.b_velop.XmlRpc.Code
 {
-    public abstract class GraphQLService
+    public abstract class GraphQLService<T>
     {
         protected GraphQLClient GraphQLClient { get; }
         private Secrets _secrets { get; }
         protected TokenService _tokenService { get; }
-        protected ILogger<object> _logger;
+        protected ILogger<T> _logger;
 
         protected GraphQLService(
             TokenService tokenService,
             GraphQLClient graphQLClient,
-            ILogger<object> logger)
+            ILogger<T> logger)
         {
             _tokenService = tokenService;
             _logger = logger;

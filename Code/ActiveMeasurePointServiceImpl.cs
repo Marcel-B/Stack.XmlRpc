@@ -9,12 +9,12 @@ using Microsoft.Extensions.Logging;
 
 namespace com.b_velop.XmlRpc.Code
 {
-    public class ActiveMeasurePointServiceImpl : GraphQLService, ActiveMeasurePointService
+    public class ActiveMeasurePointServiceImpl : GraphQLService<ActiveMeasurePointService>, ActiveMeasurePointService
     {
         public ActiveMeasurePointServiceImpl(
             TokenService tokenService,
             GraphQLClient graphQLClient,
-            ILogger<object> logger) : base(tokenService, graphQLClient, logger)
+            ILogger<ActiveMeasurePointService> logger) : base(tokenService, graphQLClient, logger)
         {
         }
 

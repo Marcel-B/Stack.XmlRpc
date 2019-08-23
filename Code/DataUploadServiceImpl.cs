@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace com.b_velop.XmlRpc.Code
 {
-    public class DataUploadServiceImpl : GraphQLService, DataUploadService
+    public class DataUploadServiceImpl : GraphQLService<DataUploadService>, DataUploadService
     {
         private readonly IMemoryCache _cache;
 
@@ -19,7 +19,7 @@ namespace com.b_velop.XmlRpc.Code
             IMemoryCache cache,
             TokenService tokenService,
             GraphQLClient graphQLClient,
-            ILogger<object> logger) : base(tokenService, graphQLClient, logger)
+            ILogger<DataUploadService> logger) : base(tokenService, graphQLClient, logger)
         {
             _cache = cache;
         }
