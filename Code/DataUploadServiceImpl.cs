@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using com.b_velop.XmlRpc.BL;
 using com.b_velop.XmlRpc.Constants;
@@ -10,13 +8,12 @@ using com.b_velop.XmlRpc.Services.Http;
 using GraphQL.Client;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
 
 namespace com.b_velop.XmlRpc.Code
 {
     public class DataUploadServiceImpl : GraphQLService, DataUploadService
     {
-        private IMemoryCache _cache;
+        private readonly IMemoryCache _cache;
 
         public DataUploadServiceImpl(
             IMemoryCache cache,
@@ -29,10 +26,10 @@ namespace com.b_velop.XmlRpc.Code
 
         public async Task UploadValuesAsync()
         {
-            if (!_cache.TryGetValue(b_velop.XmlRpc.Constants.Strings.Values, out HomematicValueList values))
+            if (!_cache.TryGetValue(Strings.Values, out HomematicValueList values))
                 return;
 
-            if (!_cache.TryGetValue(b_velop.XmlRpc.Constants.Strings.MeasurePoints,
+            if (!_cache.TryGetValue(Strings.MeasurePoints,
                 out Dictionary<string, Guid> measurePoints))
             {
                 var response = await PostRequestAsync(XmlRpc.Constants.Query.MeasurePoints);
@@ -42,11 +39,10 @@ namespace com.b_velop.XmlRpc.Code
                 {
                     measurePoints[measurePoint.ExternId] = measurePoint.Id;
                 }
-                _cache.Set(XmlRpc.Constants.Strings.MeasurePoints, measurePoints);
+                _cache.Set(Strings.MeasurePoints, measurePoints);
             }
 
             var homeValues = values.WithdrawItems();
-
 
             var uploadValues = new List<double>();
             var uploadPoints = new List<Guid>();
@@ -61,6 +57,9 @@ namespace com.b_velop.XmlRpc.Code
                 uploadValues.Add(currentValue);
                 uploadPoints.Add(point);
             }
+
+            _logger.LogInformation($"'{uploadPoints.Count}' values to upload");
+
             if (uploadValues.Count == 0)
                 return;
 
