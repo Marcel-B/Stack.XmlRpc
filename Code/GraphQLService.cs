@@ -14,7 +14,7 @@ namespace com.b_velop.XmlRpc.Code
     public abstract class GraphQLService<T>
     {
         protected GraphQLClient GraphQLClient { get; }
-        private Secrets _secrets { get; }
+        //private Secrets _secrets { get; }
         protected TokenService _tokenService { get; }
         protected ILogger<T> _logger;
 

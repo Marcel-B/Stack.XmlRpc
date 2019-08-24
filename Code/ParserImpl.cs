@@ -71,9 +71,9 @@ namespace com.b_velop.XmlRpc.Code
                         {
                             // Alarm knopf wurde gedrückt
                             var state = _alarmIds[homematicValue.AllId];
+                            _cache.Set(Strings.AlarmActive, state);
                             _logger.LogInformation($"Alarm '{homematicValue.AllId}' push to {_alarmIds[homematicValue.AllId]}");
                             await _alarmService.UpdateAlarmAsync();
-                            _cache.Set(Strings.AlarmActive, state);
                         }
                         if (activeIds.Contains(homematicValue.AllId))
                         {
