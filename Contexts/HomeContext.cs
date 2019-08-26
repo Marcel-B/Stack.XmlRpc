@@ -14,7 +14,8 @@ namespace com.b_velop.XmlRpc.Contexts
             optionsBuilder.UseSqlite("Data Source=home.db");
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(
+            ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<StateEntity>().HasData(
                 new StateEntity

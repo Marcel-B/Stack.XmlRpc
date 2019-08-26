@@ -55,7 +55,7 @@ namespace com.b_velop.XmlRpc.Code
             try
             {
                 _logger.LogInformation($"Disconnect:\n{Strings.Init}");
-                var content = new StringContent(Strings.Deinit, Encoding.Default, "text/xml");
+                var content = new StringContent(Strings.DeInit, Encoding.Default, "text/xml");
                 var response = await _client.PostAsync("/", content);
                 if (response.IsSuccessStatusCode)
                 {
