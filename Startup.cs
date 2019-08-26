@@ -85,7 +85,6 @@ namespace com.b_velop.XmlRpc
                 AlarmFloor = alarmFloor,
                 AlarmLiving = alarmLiving
             });
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

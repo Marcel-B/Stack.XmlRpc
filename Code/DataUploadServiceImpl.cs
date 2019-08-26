@@ -6,6 +6,7 @@ using com.b_velop.XmlRpc.Constants;
 using com.b_velop.XmlRpc.Models;
 using com.b_velop.XmlRpc.Services.Http;
 using GraphQL.Client;
+using GraphQL.Common.Response;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -24,6 +25,25 @@ namespace com.b_velop.XmlRpc.Code
             _cache = cache;
         }
 
+        public async Task<Dictionary<string, Guid>> RequestMeasurePointsAsync()
+        {
+            var response = await PostRequestAsync(Query.MeasurePoints);
+
+            if (response.Errors != null) // Error while getting MeasurePoints
+            {
+                HandleGraphQlError($"Error occurred while request MeasurePoints:", response);
+                return null;
+            }
+
+            var mPoints = response.GetDataFieldAs<IEnumerable<MeasurePoint>>("measurePoints");
+            var measurePoints = new Dictionary<string, Guid>();
+
+            foreach (var measurePoint in mPoints)
+                measurePoints[measurePoint.ExternId] = measurePoint.Id;
+
+            return measurePoints;
+        }
+
         public async Task UploadValuesAsync()
         {
             if (!_cache.TryGetValue(Strings.Values, out HomematicValueList values))
@@ -32,23 +52,14 @@ namespace com.b_velop.XmlRpc.Code
             if (!_cache.TryGetValue(Strings.MeasurePoints,
                 out Dictionary<string, Guid> measurePoints))
             {
-                var response = await PostRequestAsync(Query.MeasurePoints);
-
-                if (response == null) // Error while getting MeasurePoints
+                measurePoints = await RequestMeasurePointsAsync();
+                if (measurePoints == null)
                     return;
-
-                var mPoints = response.GetDataFieldAs<IEnumerable<MeasurePoint>>("measurePoints");
-                measurePoints = new Dictionary<string, Guid>();
-
-                foreach (var measurePoint in mPoints)
-                {
-                    measurePoints[measurePoint.ExternId] = measurePoint.Id;
-                }
-
                 _cache.Set(Strings.MeasurePoints, measurePoints);
             }
 
             var homeValues = values.WithdrawItems();
+
             var uploadValues = new List<double>();
             var uploadPoints = new List<Guid>();
 
@@ -72,8 +83,15 @@ namespace com.b_velop.XmlRpc.Code
                             Query.CreateMeasureValueBunch,
                             "InsertMeasureValueBunch",
                             new { points = uploadPoints, values = uploadValues });
-            _logger.LogInformation($"Uploaded '{uploadValues.Count}' values with status code {result}");
 
+            if (result != null)
+            {
+                _logger.LogInformation($"Uploaded '{uploadValues.Count}' values.");
+                return;
+            }
+
+            _logger.LogWarning(2222, $"Error occurred while uploading '{uploadValues.Count}' values. Add back to Collection.");
+            values.AddRange(homeValues);
         }
     }
 }
