@@ -28,6 +28,20 @@ namespace com.b_velop.XmlRpc.Code
             GraphQLClient = graphQLClient;
         }
 
+        protected void HandleGraphQlError(
+            string message,
+            GraphQLResponse response)
+        {
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(message);
+            stringBuilder.AppendLine();
+
+            foreach (var error in response.Errors)
+                stringBuilder.AppendLine(error.Message);
+
+            _logger.LogError(2222, stringBuilder.ToString());
+        }
+
         protected async Task<GraphQLResponse> PostRequestAsync(
             string query)
         {
@@ -44,25 +58,15 @@ namespace com.b_velop.XmlRpc.Code
                     Query = query
                 };
 
-                var result = await GraphQLClient.PostAsync(graphQLRequest);
+                var response = await GraphQLClient.PostAsync(graphQLRequest);
 
-                if (result.Errors != null)
+                if (response.Errors != null)
                 {
-                    StringBuilder sb = new StringBuilder();
-                    foreach (var error in result.Errors)
-                    {
-                        sb.AppendLine(error.Message);
-                    }
-
-                    sb.AppendLine();
-                    sb.AppendLine();
-
-                    _logger.LogWarning(2232,
-                        $"Error occurred while upload HomeMatic values with GraphQL: '{sb.ToString()}'"); // '{(int)result.StatusCode}: {result.ReasonPhrase}'");
+                    HandleGraphQlError($"Error occurred while upload HomeMatic values with GraphQL.", response);
                     return null;
                 }
 
-                return result;
+                return response;
             }
             catch (Exception ex)
             {
@@ -73,7 +77,7 @@ namespace com.b_velop.XmlRpc.Code
         }
 
 
-        protected async Task<int> PostRequestAsync(
+        protected async Task<GraphQLResponse> PostRequestAsync(
                 string query,
                 string operationName,
                 dynamic variables)
@@ -90,28 +94,19 @@ namespace com.b_velop.XmlRpc.Code
                     Variables = variables
                 };
 
-                var result = await GraphQLClient.PostAsync(graphQLRequest);
-                // TODO - Loger Error to Logstash
-                //var result = await _client.PostAsync("/api/values", jsonContent, CancellationToken.None);
-                if (result.Errors != null)
-                {
-                    StringBuilder sb = new StringBuilder();
-                    foreach (var error in result.Errors)
-                    {
-                        sb.AppendLine(error.Message);
-                    }
-                    sb.AppendLine();
-                    sb.AppendLine();
+                var response = await GraphQLClient.PostAsync(graphQLRequest);
 
-                    _logger.LogWarning(2232, $"Error occurred while upload HomeMatic values with GraphQL: '{sb.ToString()}'");// '{(int)result.StatusCode}: {result.ReasonPhrase}'");
-                    return (int)500;//result.StatusCode;
+                if (response.Errors != null)
+                {
+                    HandleGraphQlError($"Error occurred while upload HomeMatic values with GraphQL:", response);
+                    return null;
                 }
-                return 200;
+                return response;
             }
             catch (Exception ex)
             {
-                _logger.LogError(2232, ex, $"Error occurred while uploading HomeMatic values with GraphQL");// '{content}'.");
-                return 500;
+                _logger.LogError(2232, ex, $"Error occurred while uploading HomeMatic values with GraphQL:");// '{content}'.");
+                return null;
             }
         }
 
