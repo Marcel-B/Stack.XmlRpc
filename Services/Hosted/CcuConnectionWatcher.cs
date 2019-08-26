@@ -35,10 +35,8 @@ namespace com.b_velop.XmlRpc.Services.Hosted
             _cache.Set(Strings.AlarmIds, new Dictionary<string, bool>
             {
                 // Alarmknopf
-                //{"NEQ0889879:1:INSTALL_TEST", nhew Guid("") },
                 {"NEQ0889879:1:PRESS_SHORT", false}, // AUS
                 {"NEQ0889879:1:PRESS_LONG", false}, // AUS
-                //{"NEQ0889879:2:INSTALL_TEST", new Guid("") },
                 {"NEQ0889879:2:PRESS_SHORT", true}, // AN
                 {"NEQ0889879:2:PRESS_LONG", true}, // AN
 
@@ -60,6 +58,7 @@ namespace com.b_velop.XmlRpc.Services.Hosted
                 var alarm = sco.ServiceProvider.GetRequiredService<AlarmService>();
                 await alarm.UpdateAlarmAsync();
             }
+
             if (!_cache.TryGetValue(Strings.LastConnection, out DateTime time))
             {
                 _logger.LogInformation("No Connection. Start connecting to CCU");
@@ -96,6 +95,10 @@ namespace com.b_velop.XmlRpc.Services.Hosted
                 {
                     var activeMeasurePointService = scope.ServiceProvider.GetRequiredService<ActiveMeasurePointService>();
                     var activeMeasurePoints = await activeMeasurePointService.GetActiveMeasurePointsAsync();
+
+                    if (activeMeasurePoints == null)
+                        return;
+
                     var activeIds = activeMeasurePoints.Where(_ => _.IsActive).Select(_ => _.ExternId);
                     _cache.Set(Strings.ActiveMeasurePoints, activeIds.ToArray());
                 }

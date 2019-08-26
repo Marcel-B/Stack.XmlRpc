@@ -13,8 +13,26 @@
       <Publish Condition="'%(PackageReference.Version)' == ''">true</Publish>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.4" />
     <PackageReference Include="NLog" Version="4.6.6" />
     <PackageReference Include="NLog.StructuredLogging.Json" Version="4.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Contexts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="home.db" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="home.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="home.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

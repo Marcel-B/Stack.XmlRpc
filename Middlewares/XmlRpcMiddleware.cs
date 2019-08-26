@@ -52,6 +52,7 @@ namespace com.b_velop.XmlRpc.Middlewares
 
                 using (var sw = new StreamWriter(httpContext.Response.Body))
                     await sw.WriteAsync(Response);
+
                 _cache.Set(Strings.LastConnection, DateTime.Now);
             }
             return;

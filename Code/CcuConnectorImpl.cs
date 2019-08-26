@@ -21,6 +21,7 @@ namespace com.b_velop.XmlRpc.Code
             ILogger<CcuConnectorImpl> logger)
         {
             _client = client;
+            _client.Timeout = TimeSpan.FromSeconds(5);
             _cache = cache;
             _logger = logger;
             _client.BaseAddress = new Uri("http://homematic-raspi:2001");
@@ -32,7 +33,7 @@ namespace com.b_velop.XmlRpc.Code
             //_client.DefaultRequestHeaders.Add("Content-Length", Strings.Init.Length.ToString());
             try
             {
-                _logger.LogInformation($"Connect:\n{Strings.Init}");
+                _logger.LogInformation(2225, $"Connect:\n{Strings.Init}");
                 var content = new StringContent(Strings.Init, Encoding.Default, "text/xml");
                 var response = await _client.PostAsync("/", content);
                 if (response.IsSuccessStatusCode)
@@ -43,9 +44,8 @@ namespace com.b_velop.XmlRpc.Code
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error");
+                _logger.LogError(2225, e, $"Error occurred while connecting to ccu '{_client.BaseAddress}'");
             }
-
         }
 
         public async Task DisconnectCcu()

@@ -4,6 +4,7 @@ using System.Net.Mime;
 using com.b_velop.XmlRpc.BL;
 using com.b_velop.XmlRpc.Code;
 using com.b_velop.XmlRpc.Constants;
+using com.b_velop.XmlRpc.Contexts;
 using com.b_velop.XmlRpc.Middlewares;
 using com.b_velop.XmlRpc.Models;
 using com.b_velop.XmlRpc.Services.Hosted;
@@ -42,6 +43,11 @@ namespace com.b_velop.XmlRpc
                 var l = (DictionaryEntry)e;
                 Logger.LogInformation($"Environment Variable: {l.Key} = {l.Value}");
             }
+
+            services
+                .AddEntityFrameworkSqlite()
+                .AddDbContext<HomeContext>();
+
             var clientId = System.Environment.GetEnvironmentVariable("ClientId");
             var scope = System.Environment.GetEnvironmentVariable("Scope");
             var secret = System.Environment.GetEnvironmentVariable("Secret");

@@ -32,18 +32,23 @@ namespace com.b_velop.XmlRpc.Code
             if (!_cache.TryGetValue(Strings.MeasurePoints,
                 out Dictionary<string, Guid> measurePoints))
             {
-                var response = await PostRequestAsync(XmlRpc.Constants.Query.MeasurePoints);
+                var response = await PostRequestAsync(Query.MeasurePoints);
+
+                if (response == null) // Error while getting MeasurePoints
+                    return;
+
                 var mPoints = response.GetDataFieldAs<IEnumerable<MeasurePoint>>("measurePoints");
                 measurePoints = new Dictionary<string, Guid>();
+
                 foreach (var measurePoint in mPoints)
                 {
                     measurePoints[measurePoint.ExternId] = measurePoint.Id;
                 }
+
                 _cache.Set(Strings.MeasurePoints, measurePoints);
             }
 
             var homeValues = values.WithdrawItems();
-
             var uploadValues = new List<double>();
             var uploadPoints = new List<Guid>();
 

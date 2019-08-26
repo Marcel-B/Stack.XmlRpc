@@ -36,7 +36,6 @@ namespace com.b_velop.XmlRpc.Code
 
         public async Task<Token> RequestTokenAsync()
         {
-
             if (_cache.TryGetValue(Strings.Token, out Token token) && _cache.TryGetValue(Strings.Expiration, out DateTime valid))
             {
                 if (valid > DateTime.Now)

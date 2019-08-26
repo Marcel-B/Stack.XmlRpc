@@ -32,6 +32,9 @@ namespace com.b_velop.XmlRpc.Code
             string query)
         {
             var token = await _tokenService.RequestTokenAsync();
+            if (token == null)
+                return null;
+
             SetHeader(token);
 
             try
