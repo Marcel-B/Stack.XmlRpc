@@ -102,8 +102,14 @@ namespace com.b_velop.XmlRpc.Code
                             _logger.LogInformation($"Alarm '{homematicValue.AllId}' push to {_alarmIds[homematicValue.AllId]}");
                             await _alarmService.UpdateAlarmAsync();
                         }
+
                         if (activeIds.Contains(homematicValue.AllId))
                         {
+                            var doublette = values.FirstOrDefault(_ => _.AllId == homematicValue.AllId && _.Time == homematicValue.Time);
+                            if (doublette != null)
+                            {
+                                _logger.LogInformation($"False Value: Contains '{doublette}'\n'{homematicValue}'");
+                            }
                             values.Add(homematicValue);
                         }
                     }

@@ -5,7 +5,6 @@ namespace com.b_velop.XmlRpc.Services.Http
 {
     public interface TokenService
     {
-
         Task<Token> RequestTokenAsync();
     }
 }
