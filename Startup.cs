@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Net.Mime;
 using com.b_velop.XmlRpc.BL;
 using com.b_velop.XmlRpc.Code;
 using com.b_velop.XmlRpc.Constants;
@@ -33,8 +31,6 @@ namespace com.b_velop.XmlRpc
             Environment = environment;
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
             Hashtable evs = (Hashtable)System.Environment.GetEnvironmentVariables();
@@ -87,7 +83,6 @@ namespace com.b_velop.XmlRpc
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app,
             IHostingEnvironment env)
@@ -99,7 +94,7 @@ namespace com.b_velop.XmlRpc
             app.UseXmlRpc();
             app.Run(async (context) =>
             {
-                await context.Response.WriteAsync("Hello World!");
+                await context.Response.WriteAsync("Client Ready!");
             });
         }
     }

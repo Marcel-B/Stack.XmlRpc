@@ -10,9 +10,7 @@ namespace com.b_velop.XmlRpc
     {
         public static void Main(string[] args)
         {
-            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            var environmentVariables = Environment.GetEnvironmentVariables();
-            var file = "nlog.config"; //env ==  "Development" ? "nlog-dev.config" : "nlog.config";
+            var file = "nlog.config";
             var logger = NLogBuilder.ConfigureNLog(file).GetCurrentClassLogger();
             try
             {
