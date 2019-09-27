@@ -14,23 +14,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    },
-    "XmlRpc": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "HomematicEndpoint": "http://homematic-raspi:2001",
-        "Issuer": "https://newidentity.qaybe.de",
-        "Scope": "graphql.writer",
-        "Secret": "XAbkjjgjpa36FDRE8RUJGXAmwBaW",
-        "InstanceName": "MacBook",
-        "AlarmLiving": "http://192.168.178.23",
-        "ClientId": "stack.xmlrpc",
-        "AlarmFloor": "http://192.168.178.24",
-        "InstanceEndpoint": "http://192.168.178.21:5042",
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "http://localhost:5000"
     }
   }
 }
